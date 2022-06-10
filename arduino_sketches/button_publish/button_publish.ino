@@ -18,16 +18,11 @@
 
 ros::NodeHandle nh;
 
-std_msgs::Int8 pushed_msg;
-ros::Publisher pub_button("pushed", &pushed_msg);
+std_msgs::Int8 button1_msg;
+ros::Publisher pub_button1("button1_state", &button1_msg);
 
-const int button_pin = 2;
-const int led_pin = 13;
-
-bool last_reading;
-long last_debounce_time=0;
-long debounce_delay=50;
-bool published = true;
+const int button1_led_pin = 3;
+const int button2_led_pin = 4;
 
 struct PayloadStruct
 {
@@ -49,20 +44,15 @@ RF24 radio(CE_PIN, CSN_PIN);
 void setup()
 {
   nh.initNode();
-  nh.advertise(pub_button);
+  nh.advertise(pub_button1);
 
   payload.buttonState = 5;
   
-  //initialize an LED output pin 
-  //and a input pin for our push button
-  pinMode(led_pin, OUTPUT);
-  pinMode(button_pin, INPUT);
-  
-  //Enable the pullup resistor on the button
-  digitalWrite(button_pin, HIGH);
-  
-  //The button is a normally button
-  last_reading = ! digitalRead(button_pin);
+  pinMode(button1_led_pin, OUTPUT);
+  pinMode(button2_led_pin, OUTPUT);
+
+  digitalWrite(button1_led_pin, LOW);
+  digitalWrite(button2_led_pin, LOW);
 
   radio.begin();
   radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
@@ -83,6 +73,8 @@ void loop()
     if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
       radio.read(&payload, bytes);            // fetch payload from FIFO
+      digitalWrite(button1_led_pin, HIGH);
+      delay(100);
 //      Serial.print(F("Received "));
 //      Serial.print(bytes);                    // print the size of the payload
 //      Serial.print(F(" bytes on pipe "));
@@ -92,10 +84,12 @@ void loop()
 //      Serial.print(F("   State: "));
 //      Serial.println(payload.buttonState);      // print the payload's number
     }
+    else{
+      digitalWrite(button1_led_pin, LOW);
+    }
 
-  pushed_msg.data = payload.buttonState;
-  pub_button.publish(&pushed_msg);
-
+  button1_msg.data = payload.buttonState;
+  pub_button1.publish(&button1_msg);
   
   nh.spinOnce();
   delay(100);
