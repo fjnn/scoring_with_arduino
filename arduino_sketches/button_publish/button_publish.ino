@@ -20,6 +20,8 @@ ros::NodeHandle nh;
 
 std_msgs::Int8 button1_msg;
 ros::Publisher pub_button1("button1_state", &button1_msg);
+std_msgs::Int8 button2_msg;
+ros::Publisher pub_button2("button2_state", &button2_msg);
 
 const int button1_led_pin = 3;
 const int button2_led_pin = 4;
@@ -45,6 +47,7 @@ void setup()
 {
   nh.initNode();
   nh.advertise(pub_button1);
+  nh.advertise(pub_button2);
 
   payload.buttonState = 5;
   
@@ -76,10 +79,12 @@ void loop()
 
       if(payload.buttonID == 1){
         digitalWrite(button1_led_pin, HIGH);
+        button1_msg.data = payload.buttonState;
         delay(100);
       }
       else if(payload.buttonID == 2){
         digitalWrite(button2_led_pin, HIGH);
+        button2_msg.data = payload.buttonState;
         delay(100);
       }
       else{
@@ -100,8 +105,8 @@ void loop()
       digitalWrite(button2_led_pin, LOW);
     }
 
-  button1_msg.data = payload.buttonState;
   pub_button1.publish(&button1_msg);
+  pub_button2.publish(&button2_msg);
   
   nh.spinOnce();
   delay(100);
