@@ -73,8 +73,19 @@ void loop()
     if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
       uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
       radio.read(&payload, bytes);            // fetch payload from FIFO
-      digitalWrite(button1_led_pin, HIGH);
-      delay(100);
+
+      if(payload.buttonID == 1){
+        digitalWrite(button1_led_pin, HIGH);
+        delay(100);
+      }
+      else if(payload.buttonID == 2){
+        digitalWrite(button2_led_pin, HIGH);
+        delay(100);
+      }
+      else{
+      digitalWrite(button1_led_pin, LOW);
+      digitalWrite(button2_led_pin, LOW);
+      }
 //      Serial.print(F("Received "));
 //      Serial.print(bytes);                    // print the size of the payload
 //      Serial.print(F(" bytes on pipe "));
@@ -86,6 +97,7 @@ void loop()
     }
     else{
       digitalWrite(button1_led_pin, LOW);
+      digitalWrite(button2_led_pin, LOW);
     }
 
   button1_msg.data = payload.buttonState;
