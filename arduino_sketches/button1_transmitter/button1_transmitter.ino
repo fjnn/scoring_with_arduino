@@ -11,7 +11,7 @@
 struct PayloadStruct
 {
   uint8_t buttonID;
-  bool buttonState;
+  uint8_t buttonState;
 };
 PayloadStruct payload;
 
@@ -52,8 +52,7 @@ void setup() {
 
 void loop() {
   // read the value at analog input
-  button_val = digitalRead(button_pin);
-  payload.buttonState = button_val;
+  payload.buttonState = digitalRead(button_pin);
 
   unsigned long start_timer = micros();                    // start the timer
   bool report = radio.write(&payload, sizeof(payload));    // transmit & save the report

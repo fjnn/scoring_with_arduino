@@ -9,6 +9,7 @@
 
 #include <ros.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int8.h>
 
 #define CE_PIN 9
 #define CSN_PIN 10
@@ -17,7 +18,7 @@
 
 ros::NodeHandle nh;
 
-std_msgs::Bool pushed_msg;
+std_msgs::Int8 pushed_msg;
 ros::Publisher pub_button("pushed", &pushed_msg);
 
 const int button_pin = 2;
@@ -31,7 +32,7 @@ bool published = true;
 struct PayloadStruct
 {
   uint8_t buttonID;
-  bool buttonState;
+  uint8_t buttonState;
 };
 PayloadStruct payload;
 
@@ -49,6 +50,8 @@ void setup()
 {
   nh.initNode();
   nh.advertise(pub_button);
+
+  payload.buttonState = 5;
   
   //initialize an LED output pin 
   //and a input pin for our push button
@@ -90,14 +93,9 @@ void loop()
 //      Serial.println(payload.buttonState);      // print the payload's number
     }
 
-  bool reading = payload.buttonState;
-
-  pushed_msg.data = reading;
+  pushed_msg.data = payload.buttonState;
   pub_button.publish(&pushed_msg);
 
-  
-  //if the button value has not changed during the debounce delay
-  // we know it is stable
   
   nh.spinOnce();
   delay(100);
