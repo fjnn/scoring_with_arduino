@@ -91,22 +91,14 @@ void loop()
     }
 
   bool reading = payload.buttonState;
-  
-  if (last_reading!= reading){
-      last_debounce_time = millis();
-      published = false;
-  }
+
+  pushed_msg.data = reading;
+  pub_button.publish(&pushed_msg);
+
   
   //if the button value has not changed during the debounce delay
   // we know it is stable
-  if ( !published && (millis() - last_debounce_time)  > debounce_delay) {
-    digitalWrite(led_pin, reading);
-    pushed_msg.data = reading;
-    pub_button.publish(&pushed_msg);
-    published = true;
-  }
-
-  last_reading = reading;
   
   nh.spinOnce();
+  delay(100);
 }
