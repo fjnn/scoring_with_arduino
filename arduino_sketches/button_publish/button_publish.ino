@@ -28,6 +28,13 @@ long last_debounce_time=0;
 long debounce_delay=50;
 bool published = true;
 
+struct PayloadStruct
+{
+  uint8_t buttonID;
+  bool buttonState;
+};
+PayloadStruct payload;
+
 const uint64_t address[6] = {0x7878787878LL,
                        0xB3B4B5B6F1LL,
                        0xB3B4B5B6CDLL,
@@ -56,7 +63,7 @@ void setup()
 
   radio.begin();
   radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
-  //radio.setPayloadSize(sizeof(payload));
+  radio.setPayloadSize(sizeof(payload));
   for (uint8_t i = 0; i < TX_AMOUNT; ++i)
       radio.openReadingPipe(i, address[i]);
 
@@ -67,7 +74,23 @@ void setup()
 void loop()
 {
   
-  bool reading = ! digitalRead(button_pin);
+  //bool reading = ! digitalRead(button_pin);
+  
+  uint8_t pipe;
+    if (radio.available(&pipe)) {             // is there a payload? get the pipe number that recieved it
+      uint8_t bytes = radio.getPayloadSize(); // get the size of the payload
+      radio.read(&payload, bytes);            // fetch payload from FIFO
+//      Serial.print(F("Received "));
+//      Serial.print(bytes);                    // print the size of the payload
+//      Serial.print(F(" bytes on pipe "));
+//      Serial.print(pipe);                     // print the pipe number
+//      Serial.print(F(" RECEIVED!   Button: "));
+//      Serial.print(payload.buttonID);           // print the payload's origin
+//      Serial.print(F("   State: "));
+//      Serial.println(payload.buttonState);      // print the payload's number
+    }
+
+  bool reading = payload.buttonState;
   
   if (last_reading!= reading){
       last_debounce_time = millis();

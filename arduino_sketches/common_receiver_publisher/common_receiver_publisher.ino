@@ -27,7 +27,7 @@ ros::Publisher pub_button2("button2", &button2_msg);
 struct PayloadStruct
 {
   uint8_t buttonID;
-  bool buttonState;
+  uint8_t buttonState;
 };
 PayloadStruct payload;
 
