@@ -7,6 +7,7 @@
 #include <RF24.h>
 #define CE_PIN 9
 #define CSN_PIN 10
+#define LED_PIN 8
 
 struct PayloadStruct
 {
@@ -32,7 +33,7 @@ void setup() {
     Serial.println(F("radio hardware is not responding!!"));
     while (1) {} // hold in infinite loop
   }
-  Serial.println("NRF common receiver is set");
+  Serial.println("NRF transmitter-1 is set");
   radio.setPALevel(RF24_PA_LOW); // RF24_PA_MAX is default.
   radio.setPayloadSize(sizeof(payload));
 
@@ -48,11 +49,13 @@ void setup() {
   // radio.printPrettyDetails(); // (larger) function that prints human readable data
 
   pinMode(button_pin, INPUT);
+  pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() {
   // read the value at analog input
   payload.buttonState = digitalRead(button_pin);
+  digitalWrite(LED_PIN, !payload.buttonState);
 
   unsigned long start_timer = micros();                    // start the timer
   bool report = radio.write(&payload, sizeof(payload));    // transmit & save the report
